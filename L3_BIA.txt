@@ -1,0 +1,104 @@
+'''1'''
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_moons
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from matplotlib.colors import ListedColormap
+
+X, y = make_moons(n_samples=200, noise=0.2, random_state=42)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.45, random_state=42)
+
+knn = KNeighborsClassifier(n_neighbors=2)
+knn.fit(X_train, y_train)
+
+accuracy = knn.score(X_test, y_test)
+print(f"Accuracy: {accuracy:.2f}")
+
+h = 0.02 # step size in the mesh
+x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
+y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
+xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
+cmap_light = ListedColormap(['#FFAAAA', '#AAAAFF'])
+cmap_bold = ListedColormap(['#FF0000', '#0000FF'])
+
+# Plot decision boundary for k = 1, 5, and 9
+for k in [1, 5, 9]:
+  knn = KNeighborsClassifier(n_neighbors=k)
+  knn.fit(X_train, y_train)
+  Z = knn.predict(np.c_[xx.ravel(), yy.ravel()])
+
+  Z = Z.reshape(xx.shape)
+  plt.figure()
+  plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
+
+  plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=cmap_bold, edgecolor='k')
+  plt.xlim(xx.min(), xx.max())
+  plt.ylim(yy.min(), yy.max())
+  plt.title(f"Decision boundary for k = {k}")
+
+plt.show()
+
+
+'''2'''
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_gaussian_quantiles
+from sklearn.svm import SVC
+
+X1, y1 = make_gaussian_quantiles(cov=7., n_samples=250, n_features=2, n_classes=3, random_state=1)
+
+clf = SVC(kernel='poly', degree=3, coef0=10, C=5)
+
+clf.fit(X1, y1)
+
+xx, yy = np.meshgrid(np.linspace(-10, 10, 500), np.linspace(-10, 10, 500))
+Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+Z = Z.reshape(xx.shape)
+
+plt.contourf(xx, yy, Z, cmap=plt.cm.Accent, alpha=0.8)
+plt.scatter(X1[:, 0], X1[:, 1], c=y1, cmap=plt.cm.Set1)
+plt.xlim(xx.min(), xx.max())
+plt.ylim(yy.min(), yy.max())
+plt.xlabel('X1')
+plt.ylabel('X2')
+plt.title('Nonlinear SVM Classification with Polynomial Kernel')
+plt.show()
+
+'''3'''
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.svm import LinearSVR
+
+np.random.seed(42)
+n = 50
+X = 6 * np.random.rand(n, 1)
+y = (1 - 2 * X + np.random.randn(n, 1)).ravel()
+
+svm_reg = LinearSVR(epsilon=0.8)
+svm_reg.fit(X, y)
+
+def find_support_vectors(svm_reg, X, y):
+  y_pred = svm_reg.predict(X)
+  off_margin = (np.abs(y - y_pred) >= svm_reg.epsilon)
+  return np.argwhere(off_margin)
+
+svm_reg.support_ = find_support_vectors(svm_reg, X, y)
+
+def plot_svm_regression(svm_reg, X, y, axes):
+  x1s = np.linspace(axes[0], axes[1], 100).reshape(100, 1)
+  y_pred = svm_reg.predict(x1s)
+  plt.plot(x1s, y_pred, "k-", linewidth=2, label=r"$\hat{y}$")
+  plt.plot(x1s, y_pred + svm_reg.epsilon, "k--")
+  plt.plot(x1s, y_pred - svm_reg.epsilon, "k--")
+  plt.scatter(X[svm_reg.support_], y[svm_reg.support_], s=200, facecolors='#FFAAAA')
+  plt.plot(X, y, "bo")
+  plt.xlabel(r"$x_1$", fontsize=18)
+  plt.legend(loc="upper left", fontsize=18)
+  plt.axis(axes)
+
+plot_svm_regression(svm_reg, X, y, [X.min(), X.max(), y.min(), y.max()])
+plt.title(r"$\epsilon = {}$".format(svm_reg.epsilon), fontsize=18)
+plt.ylabel(r"$y$", fontsize=18, rotation=0)
