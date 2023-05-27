@@ -1,0 +1,14 @@
+O6  Verficare si validare software
+O7  
+O8  
+O9  
+O10 Codesign hardware/software
+O11 Securitatea sistemelor de calcul
+
+
+
+S2
+O12 Calcul reconfigurabil
+O13 
+O14 Managementul proiectelor software
+O15 Structuri tolerante la defecte
