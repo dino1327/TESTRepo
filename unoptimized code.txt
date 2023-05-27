@@ -1,0 +1,117 @@
+struct A{
+    char c;
+    char d;
+    int i;
+};
+
+struct B{
+    char c;
+    int i;
+    char d;
+};
+
+void CodeOptimization(){
+    switch1(3);
+    switch2(1);
+    switch3(1);
+
+    for (int i = 0; i < 100; i++){
+        if (i % 2 == 0){
+            fx(i);
+        }
+        else{
+            fy(i);
+        }
+    }
+
+    int counter = 0;
+    for (int i = 0; i < 100; i++)
+        counter++;
+
+    for (int i = 1; i <= 10; ++i)
+        fx(i);
+
+    MaxFValueIntervals(3.2);
+}
+
+void fx(int i){
+    cout << i;
+}
+
+void fy(int i){
+    cout << i;
+}
+
+void switch1(int i){
+    switch (i){
+        case 1: f1(); break;
+        case 2: f2(); break;
+        case 5: f1(); break;
+        case 7: f2(); break;
+        case 10: f1(); break;
+        case 11: f2(); break;
+        case 12: f2(); break;
+        case 17: f1(); break;
+        case 18: f1(); break;
+        default: f3(); break;
+    }
+}
+
+void switch2(int i){
+    switch (i){
+        case 100: f1(); break;
+        case 200: f2(); break;
+        case 250: f2(); break;
+        case 500: f1(); break;
+        case 700: f2(); break;
+        case 750: f2(); break;
+        case 800: f2(); break;
+        case 900: f1(); break;
+        default: f3(); break;
+    }
+}
+
+void switch3(int i){
+    switch (i){
+        case 3: f1(); break;
+        case 5: f2(); break;
+        case 6: f2(); break;
+        case 7: f2(); break;
+        case 100: f1(); break;
+        case 200: f2(); break;
+        case 250: f2(); break;
+        case 700: f2(); break;
+        case 750: f2(); break;
+        case 900: f2(); break;
+        default: f3(); break;
+    }
+}
+
+void f1() { cout << "f1 called\n"; }
+void f2() { cout << "f2 called\n"; }
+void f3() { cout << "f3 called\n"; }
+
+void MaxFValueIntervals(double dB, int LeftMarginX = -100, int RightMarginX = 100, int LeftMarginY = -100, int RightMarginY = 100){
+    //maximum of the function (x*x + y*y)/(y*y +4y + b)
+    if (dB <= 0) return;
+    if (dB > 1000) return;
+
+    //This is the potential maximum value of the function
+    //and all other values could be bigger or smaller
+    double dMaximumValue = (LeftMarginX * LeftMarginX + LeftMarginY * LeftMarginY) / (LeftMarginY * LeftMarginY + dB);
+
+    double dMaximumX = LeftMarginX;
+    double dMaximumY = LeftMarginY;
+
+    for (double dX = LeftMarginX; dX <= RightMarginX; dX += 1.0)
+        for (double dY = LeftMarginY; dY <= RightMarginY; dY += 1.0)
+            if (dMaximumValue < ((dX * dX + dY * dY) / (dY * dY + 4 * dY + dB))){
+                dMaximumValue = ((dX * dX + dY * dY) / (dY * dY + 4 * dY + dB));
+                dMaximumX = dX;
+                dMaximumY = dY;
+            }
+
+    cout << "Maximum value of the function is=" << dMaximumValue << endl;
+    cout << endl << endl;
+    cout << "Value for x=" << dMaximumX << endl << "Value for y=" << dMaximumY << endl;
+}
